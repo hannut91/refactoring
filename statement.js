@@ -13,23 +13,21 @@ function statement(invoice, plays) {
     const play = plays[perf.playID];
 
     let thisAmount = 0;
+    const theGroupDiscount = (condition) => (calculation) => {
+      return condition ? calculation : 0;
+    };
 
     switch (play.type) {
       case 'tragedy': // 비극
         thisAmount = 40000;
 
-        if (perf.audience > 30) {
-          thisAmount += 1000 * (perf.audience - 30);
-        }
+        thisAmount += theGroupDiscount(perf.audience > 30)(1000 * (perf.audience - 30))
         break;
       case 'comedy': // 희극
         thisAmount = 30000;
 
-        if (perf.audience > 20) {
-          thisAmount += 10000 + 500 * (perf.audience - 20);
-        }
         thisAmount += 300 * perf.audience;
-
+        thisAmount += theGroupDiscount(perf.audience > 20)(10000 + 500 * (perf.audience - 20))
         break;
 
       default:
@@ -44,9 +42,7 @@ function statement(invoice, plays) {
       volumeCredits += Math.floor(perf.audience / 5);
     }
 
-    result += `${play.name} : ${format(thisAmount / 100)} (${
-      perf.audience
-    }석)\n`;
+    result += `${play.name} : ${format(thisAmount / 100)} (${perf.audience}석)\n`;
     totalAmount += thisAmount;
   }
 
