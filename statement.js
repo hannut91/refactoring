@@ -1,13 +1,51 @@
-function statement(invoice, plays) {
-  let totalAmount = 0;
-  let volumeCredits = 0;
-  let result = `청구내역 (고객명: ${invoice.customer})\n`;
+class Receipt {
+  constructor(format) {
+    this.format = format;
+    this.header = '';
+    this.performances = '';
+    this.totalAmount = '';
+    this.volumeCredits = '';
+  }
 
-  const format = new Intl.NumberFormat('en-US', {
+  writeHeader(invoice) {
+    this.header = `청구내역 (고객명: ${invoice.customer})\n`;
+  }
+
+  writePerformanceData(play, thisAmount, perf) {
+    this.performances = `${play.name} : ${this.format(thisAmount / 100)} (${perf.audience}석)\n`;
+  }
+
+  writeTotalAmount(totalAmount) {
+    this.totalAmount += `총액: ${this.format(totalAmount / 100)}\n`;
+  }
+
+  writeVolumeCredits(volumeCredits) {
+    this.volumeCredits += `적립 포인트: ${volumeCredits}점\n`;
+  }
+  
+  get result() {
+    return (
+      this.header + 
+      this.performances + 
+      this.totalAmount + 
+      this.volumeCredits
+    );
+  }
+}
+
+function statement(invoice, plays) {
+  const { format } = new Intl.NumberFormat('en-US', {
     style: 'currency',
     currency: 'USD',
     minimumFractionDigits: 2,
-  }).format;
+  });
+  
+  let totalAmount = 0;
+  let volumeCredits = 0;
+  
+  const receipt = new Receipt(format);;
+  
+  receipt.writeHeader(invoice);
 
   for (let perf of invoice.performances) {
     const play = plays[perf.playID];
@@ -44,16 +82,15 @@ function statement(invoice, plays) {
       volumeCredits += Math.floor(perf.audience / 5);
     }
 
-    result += `${play.name} : ${format(thisAmount / 100)} (${
-      perf.audience
-    }석)\n`;
+    receipt.writePerformanceData(play, thisAmount, perf)
+
     totalAmount += thisAmount;
   }
 
-  result += `총액: ${format(totalAmount / 100)}\n`;
-  result += `적립 포인트: ${volumeCredits}점\n`;
+  receipt.writeTotalAmount(totalAmount);
+  receipt.writeVolumeCredits(volumeCredits);
 
-  return result;
+  return receipt.result;
 }
 
 module.exports = {
