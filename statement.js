@@ -9,6 +9,10 @@ function statement(invoice, plays) {
     minimumFractionDigits: 2,
   }).format;
 
+  function calculateDiscountedTicketPrice(discountedPrice, audience , exceedingNumber) {
+    return discountedPrice * (audience - exceedingNumber)
+  }
+
   for (let perf of invoice.performances) {
     const play = plays[perf.playID];
 
@@ -19,14 +23,14 @@ function statement(invoice, plays) {
         thisAmount = 40000;
 
         if (perf.audience > 30) {
-          thisAmount += 1000 * (perf.audience - 30);
+          thisAmount += calculateDiscountedTicketPrice(1000, perf.audience, 30);
         }
         break;
       case 'comedy': // 희극
         thisAmount = 30000;
 
         if (perf.audience > 20) {
-          thisAmount += 10000 + 500 * (perf.audience - 20);
+          thisAmount += 10000 + calculateDiscountedTicketPrice(500, perf.audience, 20);
         }
         thisAmount += 300 * perf.audience;
 
