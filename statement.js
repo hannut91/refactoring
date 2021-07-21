@@ -13,7 +13,7 @@ function statement(invoice, plays) {
     const play = plays[perf.playID];
 
     let thisAmount = 0;
-    const theGroupDiscount = (condition) => (calculation) => {
+    const AddGroupDiscount = (condition) => (calculation) => {
       return condition ? calculation : 0;
     };
 
@@ -21,13 +21,13 @@ function statement(invoice, plays) {
       case 'tragedy': // 비극
         thisAmount = 40000;
 
-        thisAmount += theGroupDiscount(perf.audience > 30)(1000 * (perf.audience - 30))
+        thisAmount += AddGroupDiscount(perf.audience > 30)(1000 * (perf.audience - 30))
         break;
       case 'comedy': // 희극
         thisAmount = 30000;
 
         thisAmount += 300 * perf.audience;
-        thisAmount += theGroupDiscount(perf.audience > 20)(10000 + 500 * (perf.audience - 20))
+        thisAmount += AddGroupDiscount(perf.audience > 20)(10000 + 500 * (perf.audience - 20))
         break;
 
       default:
